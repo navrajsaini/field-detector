@@ -119,8 +119,6 @@ def processTIF(path: str, threshold: float, process_bands: list = [6, 8]):
         '''
         data = img.GetRasterBand(band)
         data = data.ReadAsArray()
-        print(band)
-        print(data.mean())
         image[:, :, band-1] = data # 5: r, 7: nir
 
     ndvi = calculateNDVI(image[:, :, 5], image[:, :, 7]) # red, nir

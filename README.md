@@ -1,4 +1,3 @@
-'''
 Function: 
 process 8 band Tiff file, calculate it's NDVI value.
 Just in case if the Tiff isn't a 8 band I did allow for changing 
@@ -17,4 +16,3 @@ Return:
     location with '_ndvi_in_4326' in the name of the file
 
     An assumption is made here: The extention of the og file is '.tif'
-'''

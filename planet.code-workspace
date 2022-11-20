@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Python: Current File",
+				"type": "python",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"args": ["/home/navraj/Downloads/20210827_162545_60_2262_3B_AnalyticMS_8b.tif",
+						 "0.7"],
+				"justMyCode": true
+			}	
+		],
+		"compounds": []
+	}
+}

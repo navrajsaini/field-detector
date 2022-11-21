@@ -47,8 +47,16 @@ def calculateNDVI(red, nir):
 
 def writeTIF(x, y, ndvi, threshold, proj, transform, dest, ndval):
     output_ndvi = copy.copy(ndvi)
+    # setting the nan value to outside the
+    # acceptable NDVI range.
+    '''
+    in theory we can have values of NDVI that are outside the -1 to 1
+    range. I wasn't sure what to do with those. Removing them is one idea.
+    For this project I left them untouched.
+    '''
+    output_ndvi = np.nan_to_num(output_ndvi, nan=ndval)
 
-    output_ndvi[np.where (ndvi < threshold)] = 1
+    output_ndvi[np.where (ndvi < threshold)] = 0
     output_ndvi[np.where (ndvi >= threshold)] = 255
 
     # debugging, break point or uncomment
@@ -62,23 +70,21 @@ def writeTIF(x, y, ndvi, threshold, proj, transform, dest, ndval):
                            gdal.GDT_UInt16)
 
     src = osr.SpatialReference()
-
     src.ImportFromEPSG(proj)
 
     dst_ds.SetProjection(src.ExportToWkt())
     dst_ds.SetGeoTransform(transform)
-    dst_ds.GetRasterBand(1).WriteArray(output_ndvi)
-    # set no data
-    dst_ds.GetRasterBand(1).SetNoDataValue(ndval)
 
     # set the colour
     band = dst_ds.GetRasterBand(1)
     colors = gdal.ColorTable()
     white = (255, (255, 255, 255))
-    black = (1, (0, 0, 0))
+    black = (0, (0, 0, 0))
     colors.SetColorEntry(*black)
     colors.SetColorEntry(*white)
     band.SetRasterColorTable(colors)
+    band.SetNoDataValue(ndval)
+    band.WriteArray(output_ndvi)
     band.SetRasterColorInterpretation(gdal.GCI_PaletteIndex)
 
     # convert to 4326 from UTM
@@ -103,8 +109,7 @@ def processTIF(path: str, threshold: float, process_bands: list = [6, 8]):
     geoTransform = img.GetGeoTransform()
 
     ndband = img.GetRasterBand(6) # read band to pick ND-value
-    ndband.SetNoDataValue(0)
-    ndval = 0
+    ndval = 5
 
     # getting projection
     source_proj = osr.SpatialReference(

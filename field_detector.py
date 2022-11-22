@@ -20,7 +20,8 @@ Return:
 
 requirements:
     GDAL 3.4.1, released 2021/12/27 installed
-    the venv already has the library installed
+    Python 3.10.6
+    GDAL 3.4.1 pip library
 
 - Active the venv
 - run field_detector.py with 'path' and 'threshold' in the args.

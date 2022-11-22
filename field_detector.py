@@ -37,6 +37,14 @@ import logging as log
 
 
 def calculateNDVI(red, nir):
+    '''
+    calculateNDVI Function: calculates the NDVI and return the np array
+    input:
+    red: the red band Array
+    nir: the nir band Array
+
+    returns: The np array for the calculated NDVI
+    '''
     check = np.logical_and (red > 1, nir > 1)
 
     np.seterr(divide='ignore', invalid='ignore')
@@ -45,13 +53,26 @@ def calculateNDVI(red, nir):
 
     return ndvi
 
-def writeTIF(x, y, ndvi, threshold, proj, transform, dest, ndval):
+def writeTIF(x, y, ndvi, threshold, proj, transform, dest, ndval=100):
+    '''
+    writeTIF function.
+    input: x, y coordinates for the tiff file
+    ndvi: np array with the NDVI data calculated in calculateNDVI function
+    threshold: threshold for the NDVI classification
+    proj: projection of the source data
+    transform: source transfrom data
+    dest: destination path
+    ndval: no Data Value to be set.
+        Currently set to 100 so that pixel value 0 shows up as desired. 
+        Can be changed if needed later
+    '''
     output_ndvi = copy.copy(ndvi)
     # setting the nan value to outside the
     # acceptable NDVI range.
     '''
     in theory we can have values of NDVI that are outside the -1 to 1
-    range. I wasn't sure what to do with those. Removing them is one idea.
+    range. They are _usually_ bad values. I wasn't sure what to do with those.
+    Removing them is one idea.
     For this project I left them untouched.
     '''
     output_ndvi = np.nan_to_num(output_ndvi, nan=ndval)
@@ -97,6 +118,19 @@ def writeTIF(x, y, ndvi, threshold, proj, transform, dest, ndval):
     del band, dst_ds
 
 def processTIF(path: str, threshold: float, process_bands: list = [6, 8]):
+    '''
+    processTIFF function
+    Params:
+        path: full path for the TIFF file, TYPE: str
+        threshold: the threshold for the NDVI classification, TYPE: float.
+            this results in the final class being:
+            NDVI < threshold and NDVI >= threshold
+    Return:
+        processes the file in the provided path. Creates a new file at the
+        location with '_ndvi_in_4326' in the name of the file
+
+        An assumption is made here: The extention of the og file is '.tif'
+    '''
     if len(process_bands) != 2:
         log.error("'process_bands' must be a list of the band numbers to\
                    calculate from NDVI.")
@@ -108,8 +142,6 @@ def processTIF(path: str, threshold: float, process_bands: list = [6, 8]):
     img = gdal.Open(path, gdal.GA_ReadOnly)
     geoTransform = img.GetGeoTransform()
 
-    ndband = img.GetRasterBand(6) # read band to pick ND-value
-    ndval = 5
 
     # getting projection
     source_proj = osr.SpatialReference(
@@ -139,7 +171,7 @@ def processTIF(path: str, threshold: float, process_bands: list = [6, 8]):
              img.RasterYSize,
              ndvi, threshold,
              int(source_proj), geoTransform,
-             dest, ndval)
+             dest)
 
 def main(path, threshold):
     processTIF(path, threshold)

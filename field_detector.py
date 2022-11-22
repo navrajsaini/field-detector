@@ -153,8 +153,8 @@ def processTIF(path: str, threshold: float, process_bands: list = [6, 8]):
     data_type = img.GetRasterBand(process_bands[0]).DataType
     image = np.empty((img.RasterYSize, img.RasterXSize, img.RasterCount),
                     dtype=gdal_array.GDALTypeCodeToNumericTypeCode(data_type))
-    # band values are: 1-8, not 0-7
 
+    # band values are: 1-8, not 0-7
     for band in process_bands: # red, nir
         '''
         only need to process the red and NIR band.

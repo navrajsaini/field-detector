@@ -11,7 +11,7 @@ Params:
     path: full path for the TIFF file, TYPE: str
     threshold: the threshold for the NDVI classification, TYPE: float.
         this results in the final class being:
-        NDVI < threshold and NDVI >= threshold
+        NDVI < threshold: 0 and NDVI >= threshold: 255
 Return:
     processes the file in the provided path. Creates a new file at the
     location with '_ndvi_in_4326' in the name of the file
